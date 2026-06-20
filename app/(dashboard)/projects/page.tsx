@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Clock, Sparkles, FolderOpen, AlertCircle, CheckCircle2, User, UserRound, Trash } from 'lucide-react';
+import { Clock, Sparkles, FolderOpen, AlertCircle, CheckCircle2, User, UserRound, Trash, ArrowRight } from 'lucide-react';
 import PaypalButton from '@/app/components/PaypalButton';
 import { getAllProjects, getAllProjectsById } from '@/app/services/projects.service';
 import { Project } from '@/app/types/projects.types';
-import { ConfigProvider, notification, Segmented } from 'antd';
+import { Button, ConfigProvider, notification, Segmented } from 'antd';
 import { useRouter } from 'next/navigation';
 import { HeartFilled, HeartOutlined } from '@ant-design/icons';
+import StatusApp from '@/app/components/StatusApp';
+import EmptyProjects from '@/app/components/EmptyProjects';
 
 type NotificationType = 'success' | 'info' | 'warning' | 'error';
 
@@ -88,19 +90,14 @@ export default function Projects() {
       {contextHolder}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">
             Tus proyectos
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Mantente al tanto de las novedades de tus proyectos y contribuciones.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Online
-          </span>
-        </div>
+        <StatusApp/>
       </div>
 
       {(() => {
@@ -113,11 +110,7 @@ export default function Projects() {
 
 
         return filteredProjects.length === 0 ? (
-          <div className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-12 text-center">
-            <FolderOpen className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-400 font-medium">No tienes proyectos registrados en este momento.</p>
-            <p className="text-xs text-slate-500 mt-1">Registra en la sección correspondiente para comenzar.</p>
-          </div>
+          <EmptyProjects/>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map((project) => {
@@ -130,11 +123,11 @@ export default function Projects() {
               return (
                 <div
                   key={project.id}
-                  className="bg-slate-950 border border-slate-800 rounded-2xl p-6 hover:border-indigo-500/30 transition duration-300 flex flex-col justify-between"
+                  className="bg-white border border-indigo-300/30 rounded-2xl px-5 pt-4 pb-3 hover:border-slate-400 transition duration-500 flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex items-start justify-between gap-4 mb-4">
-                      <span className="flex items-center gap-1 px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold rounded-lg">
+                    <div className="flex items-center justify-between gap-4 mb-4">
+                      <span className="flex items-center gap-1 px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 text-xs font-semibold rounded-lg">
                         <UserRound size={16} />
                         <span className='text-[14px]'>{project.teamSize ?? "?"}</span>
                       </span>
@@ -144,59 +137,60 @@ export default function Projects() {
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-lg text-white mb-2 line-clamp-1">
+                    <h3 className="font-bold text-lg text-slate-800 mb-2 line-clamp-1">
                       {project.title}
                     </h3>
-                    <p className="text-xs text-slate-400 mb-6 line-clamp-3 leading-relaxed">
+                    <p className="text-xs text-slate-500 mb-6 line-clamp-3 leading-relaxed">
                       {project.description}
                     </p>
                   </div>
 
-                  <div className="space-y-4 pt-4 border-t border-slate-900">
+                  <div className="space-y-2 pt-4 border-t border-slate-900">
                     <div>
                       <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
-                        <span className="text-slate-500 uppercase tracking-wider">
-                          Objetivo Recaudado
+                        <span className="text-slate-500 tracking-wider">
+                          Recaudado
                         </span>
-                        <span className="text-indigo-400">
+                        <span className="text-slate-500">
                           ${project.raised.toLocaleString()} / ${project.budget.toLocaleString()} ({progressPercent}%)
                         </span>
                       </div>
-                      <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+                      <div className="w-full bg-white rounded-full h-2 overflow-hidden border border-slate-200">
                         <div
-                          className="bg-indigo-500 h-full rounded-full transition-all duration-500"
+                          className="bg-green-400 h-full rounded-full transition-all duration-500"
                           style={{ width: `${progressPercent}%` }}
                         ></div>
                       </div>
                     </div>
-                    <div className='flex justify-between items-center'>
-                      <span className='text-white'>Contribuir:</span>
+                    {/* <div className='flex justify-between items-center'>
+                      <span className='text-slate-500'>Contribuir:</span>
                       <PaypalButton
-                      key={project.id}
-                      projectId={(project.id).toString()}
-                    />
-                    </div>
+                        key={project.id}
+                        projectId={(project.id).toString()}
+                      />
+                    </div> */}
 
                     <button
                       onClick={() => router.push(`/analysis/${project.id}`)}
-                      className="w-full py-2 bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white rounded-xl text-xs font-semibold border border-slate-800 flex items-center justify-center gap-1.5 transition cursor-pointer"
+                      className="w-full py-2 bg-emerald-200 hover:bg-slate-850 text-slate-600 hover:text-slate-700 rounded-xl text-xs font-semibold  flex items-center justify-center gap-1.5 transition cursor-pointer"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                      <Sparkles className="w-3.5 h-3.5 text-slate-500" />
                       Ver Predicción de Éxito
                     </button>
+                    <button
+                      onClick={() => router.push(`/analysis/${project.id}`)}
+                      className="group w-full py-2 bg-indigo-600 hover:bg-slate-850 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
+                    >
+                      Ver Detalle
+                      <ArrowRight
+                        className="w-3.5 h-3.5 text-white opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0"
+                      />
+                    </button>
                     <div className='flex justify-end'>
-                      <Trash className='text-red-500! text-md cursor-not-allowed'/>
-                      {/* {project.isFavorite ? (
-                        <HeartFilled
-                          onClick={() => handleFavorite(project.id)}
-                          className="text-red-500! text-xl cursor-pointer"
-                        />
-                      ) : (
-                        <HeartOutlined
-                          onClick={() => handleFavorite(project.id)}
-                          className="text-red-500! text-xl cursor-pointer"
-                        />
-                      )} */}
+                      <Button 
+                        color="danger" variant="solid" size='small'
+                        className='!text-[14px]'
+                      >Eliminar</Button>
                     </div>
                   </div>
                 </div>

@@ -47,14 +47,6 @@ export default function App({ onSelectProjectForAnalysis }: ProjectsDashboardPro
   return (
     <div className="w-full">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-            Proyectos Postulantes
-          </h2>
-          <p className="text-sm text-slate-400 mt-1">
-            Monitoreo de recaudación, tiempos de campaña y métricas de éxito en tiempo real.
-          </p>
-        </div>
         <div className="flex items-center gap-3">
           <span className="px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -81,7 +73,7 @@ export default function App({ onSelectProjectForAnalysis }: ProjectsDashboardPro
             return (
               <div
                 key={project.id}
-                className="bg-slate-950 border border-slate-800 rounded-2xl p-6 hover:border-indigo-500/30 transition duration-300 flex flex-col justify-between"
+                className="bg-white border border-slate-800 rounded-2xl p-6 hover:border-indigo-500/30 transition duration-300 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-4 mb-4">

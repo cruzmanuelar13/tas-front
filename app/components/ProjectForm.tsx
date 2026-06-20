@@ -1,152 +1,447 @@
 'use client';
 
-import { Divider } from 'antd';
+import { Button, Col, Divider, notification, Row, Select, Slider, Switch } from 'antd';
 import { useState } from 'react';
 
+type NotificationType = 'success' | 'info' | 'warning' | 'error';
+
+const SECTOR_OPTIONS = [
+  { value: 1, label: '🎓 Educación' },
+  { value: 2, label: '🏥 Salud' },
+  { value: 3, label: '💳 Fintech' },
+  { value: 4, label: '🛍️ Retail' },
+  { value: 5, label: '🔧 Otro' },
+];
+
+const COMPLEXITY_OPTIONS = [
+  { value: 'LOW', label: 'Baja' },
+  { value: 'MEDIUM', label: 'Media' },
+  { value: 'HIGH', label: 'Alta' },
+];
+
 interface ProjectFormProps {
-  initialData?: { 
-    id?: number; 
-    titulo: string; 
-    descripcion: string; 
-    montoObjetivo: number; 
+  initialData?: {
+    id?: number;
+    titulo: string;
+    descripcion: string;
+    montoObjetivo: number;
     fechaLimite: string;
     sector: string;
-    duracionEstimada: string; 
-    tamanioEquipo: string; 
-    complejidad: string; 
-    tieneMvp: boolean; 
-    tieneDocumentacion: boolean; 
-    objetivosClaros: string; 
+    duracionEstimada: string;
+    tamanioEquipo: string;
+    complejidad: string;
+    tieneMvp: boolean;
+    tieneDocumentacion: boolean;
+    objetivosClaros: string;
     estudioMercado: boolean;
-    tieneMonetizacion: boolean; 
-    tieneCompetidores: boolean; 
-    experienciaSupervisor: string; 
-    proyectosSimilares: string; 
+    tieneMonetizacion: boolean;
+    tieneCompetidores: boolean;
+    experienciaSupervisor: string;
+    proyectosSimilares: string;
   };
   isEditing?: boolean;
 }
 
+const CLARITY_LABELS: Record<number, string> = {
+  1: 'Muy vago',
+  2: 'Poco claro',
+  3: 'Moderado',
+  4: 'Bastante claro',
+  5: 'Muy claro',
+};
+
+const labelClass = 'block text-sm text-slate-800 mb-1';
+
+const inputClass =
+  'mt-1 text-slate-800 block w-full rounded-md bg-transparent border border-slate-300 shadow-sm p-2 focus:outline-none focus:border-indigo-400 placeholder-slate-500 text-sm';
+
+const ToggleField = ({
+  label,
+  hint,
+  name,
+  value,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  name: string;
+  value: boolean;
+  onChange: (name: string, val: boolean) => void;
+}) => (
+  <div className="flex items-center justify-between py-3 border-b border-slate-700 last:border-0">
+    <div className="flex-1 pr-4">
+      <p className="text-sm font-medium text-slate-800">{label}</p>
+      {hint && <p className="text-xs text-slate-500 mt-0.5">{hint}</p>}
+    </div>
+    <Switch
+      checked={value}
+      onChange={(checked) => onChange(name, checked)}
+      className={value ? 'bg-indigo-500' : 'bg-slate-600'}
+    />
+  </div>
+);
+
 export default function ProjectForm({ initialData, isEditing = false }: ProjectFormProps) {
-  
-  const [formData, setFormData] = useState({
-    titulo: initialData?.titulo || '',
-    descripcion: initialData?.descripcion || '',
-    montoObjetivo: initialData?.montoObjetivo || 0,
-    fechaLimite: initialData?.fechaLimite || '',
-    sector: initialData?.sector || '',
-    duracionEstimada: initialData?.duracionEstimada || '',
-    tamanioEquipo: initialData?.tamanioEquipo || '',
-    complejidad: initialData?.complejidad || '',
-    tieneMvp: initialData?.tieneMvp || '',
-    tieneDocumentacion: initialData?.tieneDocumentacion || '',
-    objetivosClaros: initialData?.objetivosClaros || '',
-    estudioMercado: initialData?.estudioMercado || '',
-    tieneMonetizacion: initialData?.tieneMonetizacion || '',
-    tieneCompetidores: initialData?.tieneCompetidores || '',
-    experienciaSupervisor: initialData?.experienciaSupervisor || '',
-    proyectosSimilares: initialData?.proyectosSimilares || '',
-  });
+
+  const [api, contextHolder] = notification.useNotification();
+
+  const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const value = e.target.type === 'number' ? Number(e.target.value) : e.target.value;
-    setFormData({ ...formData, [e.target.name]: value });
+  const [formData, setFormData] = useState({
+    // Paso 1 — datos básicos
+    titulo: '',
+    descripcion: '',
+    montoObjetivo: '',
+    fechaLimite: '',
+    sector: 5,
+    duracionEstimada: '',
+    tamanioEquipo: '',
+    complejidad: 'MEDIUM',
+
+    // Paso 2 — predicción
+    tieneMvp: false,
+    tieneDocumentacion: false,
+    objetivosClaros: 3,
+    estudioMercado: false,
+    tieneMonetizacion: false,
+    tieneCompetidores: false,
+    experienciaSupervisor: '',
+    proyectosSimilares: '',
+  });
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'number' ? (value === '' ? '' : Number(value)) : value,
+    }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSelect = (name: string, value: number | string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleToggle = (name: string, value: boolean) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Validación del paso 1
+  const paso1Valido =
+    formData.titulo.trim() !== '' &&
+    formData.montoObjetivo !== '' &&
+    formData.fechaLimite !== '' &&
+    formData.duracionEstimada !== '' &&
+    formData.tamanioEquipo !== '';
+
+  const handleSubmit = async () => {
     setError('');
+    setLoading(true);
 
     const token = localStorage.getItem('token');
     if (!token) {
       setError('No estás autenticado. Inicia sesión primero.');
+      setLoading(false);
       return;
     }
 
-    const url = isEditing 
-      ? `http://localhost:3001/projects/${initialData?.id}` 
-      : 'http://localhost:3001/projects';
-      
-    const method = isEditing ? 'PATCH' : 'POST';
+    const body = {
+      title: formData.titulo,
+      description: formData.descripcion,
+      budget: Number(formData.montoObjetivo),
+      deadLine: formData.fechaLimite,
+      sector: formData.sector,
+      durationMonths: Number(formData.duracionEstimada),
+      teamSize: Number(formData.tamanioEquipo),
+      complexity: formData.complejidad,
+      hasPrototype: formData.tieneMvp,
+      hasTechnicalDoc: formData.tieneDocumentacion,
+      objectiveClarity: formData.objetivosClaros,
+      hasMarketStudy: formData.estudioMercado,
+      hasMonetizationModel: formData.tieneMonetizacion,
+      hasDirectCompetitors: formData.tieneCompetidores,
+      supervisorExperience: formData.experienciaSupervisor !== '' ? Number(formData.experienciaSupervisor) : null,
+      priorSimilarProjects: formData.proyectosSimilares !== '' ? Number(formData.proyectosSimilares) : null,
+    };
 
     try {
-      const res = await fetch(url, {
-        method: method,
-        headers: { 
+      const res = await fetch('http://localhost:3001/projects', {
+        method: 'POST',
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Inyectamos el JWT de forma obligatoria
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Error al procesar el proyecto');
+      if (!res.ok) throw new Error(data.message || 'Error al crear el proyecto');
 
-      alert(isEditing ? '¡Proyecto actualizado!' : '¡Proyecto creado con éxito!');
+      openNotificationWithIcon('success')
+      resetForm();
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const resetForm = () => {
+    setStep(0);
+    setFormData({
+      titulo: '', descripcion: '', montoObjetivo: '', fechaLimite: '',
+      sector: 5, duracionEstimada: '', tamanioEquipo: '', complejidad: 'MEDIUM',
+      tieneMvp: false, tieneDocumentacion: false, objetivosClaros: 3,
+      estudioMercado: false, tieneMonetizacion: false, tieneCompetidores: false,
+      experienciaSupervisor: '', proyectosSimilares: '',
+    });
+  };
+
+  const openNotificationWithIcon = (type: NotificationType) => {
+    api[type]({
+      title: 'Exito',
+      description: 'Proyecto registrado con exito.',
+      className: 'custom-notification',
+    });
+  };
+
+
   return (
-    <form onSubmit={handleSubmit} className="mx-auto p-6 rounded-lg shadow-md space-y-6">
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+    <>
+      {contextHolder}
 
-      <div className='flex gap-4'>
-        <div>
-          <label className="block text-sm font-medium text-white">Título del Proyecto</label>
-          <input
-            type="text"
-            name="titulo"
-            value={formData.titulo}
-            required
-            onChange={handleChange}
-            className="mt-1 text-white block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-          />
+      <div className="flex flex-col gap-2">
+        <div className='py-3'>
+          <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
+            Información básica
+          </p>
+
+          <Row gutter={16} className='py-3'>
+
+            <Col span={24} className='mb-5'>
+              <label className={labelClass}>Título del proyecto *</label>
+              <input
+                type="text"
+                name="titulo"
+                value={formData.titulo}
+                onChange={handleInput}
+                required
+                placeholder="Ej: Sistema de monitoreo de salud con IA"
+                className={inputClass}
+              />
+            </Col>
+
+            <Col span={24}>
+              <label className={labelClass}>Descripción</label>
+              <textarea
+                name="descripcion"
+                value={formData.descripcion}
+                onChange={handleInput}
+                rows={3}
+                placeholder="Describe el problema que resuelve tu proyecto..."
+                className={inputClass + ' resize-none'}
+              />
+            </Col>
+          </Row>
+
+
+          <Row gutter={16} className='py-3'>
+            <Col span={12}>
+              <label className={labelClass}>Sector *</label>
+              <Select
+                className="w-full"
+                value={formData.sector}
+                onChange={(val) => handleSelect('sector', val)}
+                options={SECTOR_OPTIONS}
+              />
+            </Col>
+
+            <Col span={12}>
+              <label className={labelClass}>Complejidad técnica *</label>
+              <Select
+                className="w-full"
+                value={formData.complejidad}
+                onChange={(val) => handleSelect('complejidad', val)}
+                options={COMPLEXITY_OPTIONS}
+              />
+            </Col>
+          </Row>
+
+          <Row gutter={16} className='py-3'>
+            <Col span={12}>
+              <label className={labelClass}>Presupuesto objetivo (USD) *</label>
+              <input
+                type="number"
+                name="montoObjetivo"
+                value={formData.montoObjetivo}
+                onChange={handleInput}
+                min={0}
+                placeholder="50000"
+                className={inputClass}
+              />
+            </Col>
+
+            <Col span={12}>
+              <label className={labelClass}>Fecha límite *</label>
+              <input
+                type="date"
+                name="fechaLimite"
+                value={formData.fechaLimite}
+                onChange={handleInput}
+                className={inputClass}
+              />
+            </Col>
+          </Row>
+
+          <Row gutter={16} className='py-3'>
+            <Col span={12}>
+              <label className={labelClass}>Duración estimada (meses) *</label>
+              <input
+                type="number"
+                name="duracionEstimada"
+                value={formData.duracionEstimada}
+                onChange={handleInput}
+                min={1}
+                placeholder="6"
+                className={inputClass}
+              />
+            </Col>
+
+            {/* Tamaño equipo */}
+            <Col span={12}>
+              <label className={labelClass}>Tamaño del equipo *</label>
+              <input
+                type="number"
+                name="tamanioEquipo"
+                value={formData.tamanioEquipo}
+                onChange={handleInput}
+                min={1}
+                placeholder="3"
+                className={inputClass}
+              />
+            </Col>
+          </Row>
+
         </div>
+
         <div>
-          <label className="block text-sm font-medium text-white">Descripción</label>
-          <textarea
-            name="descripcion"
-            value={formData.descripcion}
-            required
-            onChange={handleChange}
-            rows={4}
-            className="mt-1 text-white block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-          />
+          <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-2">
+            Estado del proyecto
+          </p>
+          <div className="rounded-xl py-1">
+            <ToggleField
+              label="¿Tienen prototipo o MVP?"
+              hint="Cualquier versión funcional, aunque sea básica"
+              name="tieneMvp"
+              value={formData.tieneMvp}
+              onChange={handleToggle}
+            />
+            <ToggleField
+              label="¿Tienen documentación técnica?"
+              hint="Especificaciones, arquitectura, requisitos escritos"
+              name="tieneDocumentacion"
+              value={formData.tieneDocumentacion}
+              onChange={handleToggle}
+            />
+            <ToggleField
+              label="¿Realizaron un estudio de mercado?"
+              hint="Análisis de demanda, competencia o usuarios potenciales"
+              name="estudioMercado"
+              value={formData.estudioMercado}
+              onChange={handleToggle}
+            />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-2">
+            Viabilidad de negocio
+          </p>
+          <div className="rounded-xl py-1">
+            <ToggleField
+              label="¿Tienen modelo de monetización definido?"
+              hint="Suscripción, comisión, licencia, publicidad, etc."
+              name="tieneMonetizacion"
+              value={formData.tieneMonetizacion}
+              onChange={handleToggle}
+            />
+            <ToggleField
+              label="¿Existen competidores directos en el mercado?"
+              hint="Productos o servicios similares ya disponibles"
+              name="tieneCompetidores"
+              value={formData.tieneCompetidores}
+              onChange={handleToggle}
+            />
+          </div>
+        </div>
+
+        {/* Slider: claridad del objetivo */}
+        <div>
+          <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-2">
+            Claridad del objetivo
+          </p>
+          <div className="rounded-xl pt-3">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-slate-800">¿Qué tan claro está el problema que resuelve?</span>
+              <span className="text-sm font-semibold text-indigo-400">
+                {CLARITY_LABELS[formData.objetivosClaros]}
+              </span>
+            </div>
+            <Slider
+              min={1}
+              max={5}
+              step={1}
+              value={formData.objetivosClaros}
+              onChange={(val) => setFormData((p) => ({ ...p, objetivosClaros: val }))}
+              marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5' }}
+              className="mb-1"
+            />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-2">
+            Experiencia del equipo
+          </p>
+          <Row gutter={16}>
+            <Col span={12}>
+              <label className={labelClass}>Años de experiencia del líder</label>
+              <input
+                type="number"
+                name="experienciaSupervisor"
+                value={formData.experienciaSupervisor}
+                onChange={handleInput}
+                min={0}
+                placeholder="0"
+                className={inputClass}
+              />
+            </Col>
+            <Col span={12}>
+              <label className={labelClass}>Proyectos similares previos</label>
+              <input
+                type="number"
+                name="proyectosSimilares"
+                value={formData.proyectosSimilares}
+                onChange={handleInput}
+                min={0}
+                placeholder="0"
+                className={inputClass}
+              />
+            </Col>
+          </Row>
+        </div>
+        <div className='py-3'>
+            <Button
+              type="primary"
+              loading={loading}
+              onClick={handleSubmit}
+              className="bg-indigo-600! w-full hover:bg-indigo-500 border-none"
+            >
+            Crear proyecto
+          </Button>
         </div>
       </div>
-
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-white">Monto Objetivo ($)</label>
-          <input
-            name="montoObjetivo"
-            value={formData.montoObjetivo}
-            required
-            onChange={handleChange}
-            className="mt-1 text-white block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-white">Fecha Límite</label>
-          <input
-            type="date"
-            name="fechaLimite"
-            value={formData.fechaLimite}
-            required
-            onChange={handleChange}
-            className="mt-1 text-white block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-          />
-        </div>
-      </div>
-      <Divider className='bg-white' />
-
-      <button type="submit" className="w-full bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition">
-        {isEditing ? 'Guardar Cambios' : 'Crear Proyecto'}
-      </button>
-    </form>
+    </>
   );
 }

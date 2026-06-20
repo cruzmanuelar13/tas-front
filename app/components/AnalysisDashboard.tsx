@@ -138,8 +138,8 @@ export default function AnalysisDashboard({
       {/* Encabezado e Inyector de Selección */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight mb-2">{project?.title}</h2>
-          <p className="text-sm text-slate-400 mt-1">{project?.description}.</p>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight mb-2">{project?.title}</h2>
+          <p className="text-sm text-slate-500 mt-1">{project?.description}.</p>
         </div>
       </div>
 
@@ -147,10 +147,10 @@ export default function AnalysisDashboard({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* Tarjeta de Probabilidad de Éxito */}
-          <div className="lg:col-span-1 bg-slate-950 border border-slate-800 rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+          <div className="lg:col-span-1 bg-white border border-slate-400 rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
             <div className="absolute w-56 h-56 bg-indigo-500/5 rounded-full blur-3xl -top-10 -right-10"></div>
 
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 relative z-10">
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-widest mb-6 relative z-10">
               Probabilidad de Éxito
             </h3>
 
@@ -163,7 +163,7 @@ export default function AnalysisDashboard({
                   r="80"
                   stroke="currentColor"
                   strokeWidth="12"
-                  className="text-slate-800"
+                  className="text-slate-300"
                   fill="transparent"
                 />
                 <circle
@@ -172,7 +172,7 @@ export default function AnalysisDashboard({
                   r="80"
                   stroke="currentColor"
                   strokeWidth="12"
-                  className={`${Number(project?.successScore ?? 0) >= 80 ? "text-indigo-500" :
+                  className={`${Number(project?.successScore ?? 0) >= 80 ? "text-emerald-400" :
                       Number(project?.successScore ?? 0) >= 50 ? "text-yellow-300" :
                         "text-red-500"
                     } transition-all duration-1000 ease-out`}
@@ -182,11 +182,8 @@ export default function AnalysisDashboard({
                 />
               </svg>
               <div className="absolute flex flex-col items-center">
-                <span className="text-4xl md:text-5xl font-extrabold text-white">
+                <span className="text-4xl md:text-5xl font-extrabold text-slate-500">
                   {project?.successScore}%
-                </span>
-                <span className="text-[10px] text-indigo-400 font-semibold uppercase tracking-wider mt-1">
-                  {project?.title}
                 </span>
               </div>
             </div>
@@ -196,21 +193,21 @@ export default function AnalysisDashboard({
               <div className={`px-3 py-1 border rounded-full text-xs font-semibold inline-block mb-3 ${diagnosis.className}`}>
                 {diagnosis.text}
               </div>
-              <p className="text-xs text-slate-400 leading-relaxed px-4">
+              <p className="text-xs text-slate-500 leading-relaxed px-4">
                 {diagnosis.desc}
               </p>
             </div>
           </div>
 
           {/* Tarjeta de Recomendaciones */}
-          <div className="lg:col-span-2 bg-slate-950 border border-slate-800 rounded-2xl p-6 md:p-8">
+          <div className="lg:col-span-2 bg-white border border-slate-400 rounded-2xl p-6 md:p-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg">
                 <Lightbulb className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-lg text-white">Recomendaciones de Optimización</h3>
-                <p className="text-xs text-slate-400">Generadas mediante comparación histórica con proyectos similares y de éxito comprobado.</p>
+                <h3 className="font-bold text-lg text-slate-800">Recomendaciones de Optimización</h3>
+                <p className="text-xs text-slate-500">Generadas mediante comparación histórica con proyectos similares y de éxito comprobado.</p>
               </div>
             </div>
 
@@ -222,19 +219,19 @@ export default function AnalysisDashboard({
                 let IconComponent = ArrowRightCircle;
 
                 if (rec.type === 'positive') {
-                  borderTheme = "border-emerald-500/20 bg-emerald-950/10";
+                  borderTheme = "border-emerald-500/20 bg-green-100";
                   iconTheme = "bg-emerald-500/10 text-emerald-400";
                   IconComponent = CheckCircle2;
                 } else if (rec.type === 'warning') {
-                  borderTheme = "border-amber-500/20 bg-amber-950/10";
+                  borderTheme = "border-amber-500/20 bg-amber-50";
                   iconTheme = "bg-amber-500/10 text-amber-400";
                   IconComponent = AlertCircle;
                 } else if (rec.type === 'negative') {
-                  borderTheme = "border-rose-500/20 bg-rose-950/10";
+                  borderTheme = "border-rose-500/20 bg-red-50";
                   iconTheme = "bg-rose-500/10 text-rose-400";
                   IconComponent = AlertCircle;
                 } else {
-                  borderTheme = "border-indigo-500/20 bg-slate-900";
+                  borderTheme = "border-indigo-500/20 bg-white";
                   iconTheme = "bg-indigo-500/10 text-indigo-400";
                   IconComponent = Sparkles;
                 }
@@ -245,8 +242,8 @@ export default function AnalysisDashboard({
                       <IconComponent className="w-4 h-4" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-sm text-slate-200">{rec.title}</h4>
-                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">{rec.desc}</p>
+                      <h4 className="font-semibold text-sm text-slate-800">{rec.title}</h4>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">{rec.desc}</p>
                     </div>
                   </div>
                 );

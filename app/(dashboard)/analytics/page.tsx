@@ -1,5 +1,6 @@
 "use client"
 
+import StatusApp from '@/app/components/StatusApp';
 import { Button } from 'antd';
 import React from 'react'
 
@@ -12,9 +13,9 @@ const COLORS = ['#6366f1', '#22d3ee', '#34d399', '#f59e0b', '#f87171'];
 
 const CHART_THEME = {
   background: 'transparent',
-  textColor: '#94a3b8',
+  textColor: '#000000',
   gridColor: '#1e293b',
-  tooltipBg: '#0f172a',
+  tooltipBg: '#FFFFFF',
   tooltipBorder: '#1e293b',
 };
 
@@ -27,9 +28,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       borderRadius: 10,
       padding: '10px 14px',
       fontSize: 13,
-      color: '#e2e8f0',
+      color: '#000000',
     }}>
-      <p style={{ color: '#94a3b8', marginBottom: 4 }}>{label}</p>
+      <p style={{ color: '#000000', marginBottom: 4 }}>{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} style={{ color: p.color }}>
           {p.name}: <strong>{p.value}</strong>
@@ -48,10 +49,10 @@ const dataBarSector = [
 ];
 
 export const GraficoSectores = () => (
-  <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+  <div className="bg-white border border-slate-800 rounded-2xl p-5">
     <div className='flex justify-between'>
       <div>
-        <h3 className="text-sm font-semibold text-slate-300 mb-1">Proyectos por sector</h3>
+        <h3 className="text-sm font-semibold text-slate-800 mb-1">Proyectos por sector</h3>
         <p className="text-xs text-slate-500 mb-4">Distribución según categoría</p>
       </div>
       <div>
@@ -64,7 +65,7 @@ export const GraficoSectores = () => (
         <CartesianGrid strokeDasharray="3 3" stroke={CHART_THEME.gridColor} vertical={false} />
         <XAxis dataKey="sector" tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fill: CHART_THEME.textColor, fontSize: 12 }} axisLine={false} tickLine={false} />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1e293b' }} />
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: '#FFFFFF' }} />
         <Bar dataKey="proyectos" radius={[6, 6, 0, 0]}>
           {dataBarSector.map((_, i) => (
             <Cell key={i} fill={COLORS[i % COLORS.length]} />
@@ -86,8 +87,8 @@ const dataLineMeses = [
 ];
 
 export const GraficoTendencia = () => (
-  <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-    <h3 className="text-sm font-semibold text-slate-300 mb-1">Tendencia de publicaciones</h3>
+  <div className="bg-white border border-slate-800 rounded-2xl p-5">
+    <h3 className="text-sm font-semibold text-slate-800 mb-1">Tendencia de publicaciones</h3>
     <p className="text-xs text-slate-500 mb-4">Proyectos nuevos por mes</p>
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={dataLineMeses}>
@@ -115,8 +116,8 @@ const dataPie = [
 ];
 
 export const GraficoEstados = () => (
-  <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-    <h3 className="text-sm font-semibold text-slate-300 mb-1">Estado de proyectos</h3>
+  <div className="bg-white border border-slate-800 rounded-2xl p-5">
+    <h3 className="text-sm font-semibold text-slate-800 mb-1">Estado de proyectos</h3>
     <p className="text-xs text-slate-500 mb-4">Distribución por estado de financiamiento</p>
     <ResponsiveContainer width="100%" height={220}>
       <PieChart>
@@ -157,23 +158,23 @@ const TooltipScore = ({ active, payload }: any) => {
   const d = payload[0].payload;
   return (
     <div style={{
-      background: '#0f172a',
+      background: '#FFFFFF',
       border: '1px solid #1e293b',
       borderRadius: 10,
       padding: '10px 14px',
       fontSize: 13,
-      color: '#e2e8f0',
+      color: '#000000',
     }}>
       <p style={{ color: d.color, fontWeight: 600, marginBottom: 4 }}>{d.etiqueta}</p>
-      <p style={{ color: '#94a3b8' }}>Rango: {d.rango}</p>
+      <p style={{ color: '#000000' }}>Rango: {d.rango}</p>
       <p>Proyectos: <strong>{d.cantidad}</strong></p>
     </div>
   );
 };
 
 export const GraficoPredicciones = () => (
-  <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-    <h3 className="text-sm font-semibold text-slate-300 mb-1">Distribución de predicciones</h3>
+  <div className="bg-white border border-slate-800 rounded-2xl p-5">
+    <h3 className="text-sm font-semibold text-slate-800 mb-1">Distribución de predicciones</h3>
     <p className="text-xs text-slate-500 mb-4">Proyectos agrupados por puntaje IA</p>
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={dataScore} barSize={32}>
@@ -185,7 +186,7 @@ export const GraficoPredicciones = () => (
           tickLine={false}
         />
         <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} />
-        <Tooltip content={<TooltipScore />} cursor={{ fill: '#1e293b' }} />
+        <Tooltip content={<TooltipScore />} cursor={{ fill: '#FFFFFF' }} />
         <Bar dataKey="cantidad" name="Proyectos" radius={[6, 6, 0, 0]}>
           {dataScore.map((d, i) => (
             <Cell key={i} fill={d.color} />
@@ -202,19 +203,14 @@ const AnalyticsPage = () => {
     <div className="w-full p-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">
             Análisis de proyectos
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Visualiza el rendimiento, distribución y predicciones de éxito de todos los proyectos en la plataforma
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-xs text-slate-300 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Online
-          </span>
-        </div>
+        <StatusApp/>
       </div>
 
 

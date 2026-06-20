@@ -13,7 +13,7 @@ export default async function AnalysisPage({
   const { id } = await params;
 
   return (
-    <div className=" bg-slate-900 p-8">
+    <div className="p-8">
       <AnalysisDashboard id={id} />
     </div>
   );

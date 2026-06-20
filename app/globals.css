@@ -4,7 +4,6 @@
 
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  background-color: #0F172B;
 }
 
 .ant-modal-container {
@@ -17,12 +16,11 @@ body {
 }
 
 .ant-select-item-option-content {
-  color: white;
+  color: #1E293B;
 }
 
 .ant-select.ant-select-outlined{
-  background-color: black !important;
-  color: white;
+  color: #1E293B;
 }
 
 .ant-slider-rail{
