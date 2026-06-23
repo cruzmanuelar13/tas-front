@@ -11,6 +11,11 @@ body {
   border: 1px solid #1E205E !important;
 }
 
+.upload-file-form .ant-upload.ant-upload-select,
+.upload-file-form .ant-btn {
+  width: 100% !important;
+}
+
 .ant-steps-item-icon-number {
   color: white;
 }
@@ -54,4 +59,14 @@ body {
 }
 .ant-steps-item-rail-wait{
   background-color: gray !important;
+}
+
+.rich-content ul {
+  list-style: disc !important;
+  padding-left: 1.5rem !important;
+}
+
+.rich-content ol {
+  list-style: decimal !important;
+  padding-left: 1.5rem !important;
 }

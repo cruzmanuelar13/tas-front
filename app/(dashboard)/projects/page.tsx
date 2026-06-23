@@ -140,9 +140,11 @@ export default function Projects() {
                     <h3 className="font-bold text-lg text-slate-800 mb-2 line-clamp-1">
                       {project.title}
                     </h3>
-                    <p className="text-xs text-slate-500 mb-6 line-clamp-3 leading-relaxed">
-                      {project.description}
-                    </p>
+                    <div 
+                     className="text-xs text-slate-500 mb-6 leading-relaxed line-clamp-5 break-words"
+                    >
+                      {project.resume}
+                    </div>
                   </div>
 
                   <div className="space-y-2 pt-4 border-t border-slate-900">
@@ -162,14 +164,6 @@ export default function Projects() {
                         ></div>
                       </div>
                     </div>
-                    {/* <div className='flex justify-between items-center'>
-                      <span className='text-slate-500'>Contribuir:</span>
-                      <PaypalButton
-                        key={project.id}
-                        projectId={(project.id).toString()}
-                      />
-                    </div> */}
-
                     <button
                       onClick={() => router.push(`/analysis/${project.id}`)}
                       className="w-full py-2 bg-emerald-200 hover:bg-slate-850 text-slate-600 hover:text-slate-700 rounded-xl text-xs font-semibold  flex items-center justify-center gap-1.5 transition cursor-pointer"
@@ -178,7 +172,7 @@ export default function Projects() {
                       Ver Predicción de Éxito
                     </button>
                     <button
-                      onClick={() => router.push(`/analysis/${project.id}`)}
+                      onClick={() => router.push(`/project/${project.id}`)}
                       className="group w-full py-2 bg-indigo-600 hover:bg-slate-850 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
                     >
                       Ver Detalle
@@ -187,10 +181,9 @@ export default function Projects() {
                       />
                     </button>
                     <div className='flex justify-end'>
-                      <Button 
-                        color="danger" variant="solid" size='small'
-                        className='!text-[14px]'
-                      >Eliminar</Button>
+                      <div
+                        className='!text-[12px] font-medium cursor-pointer rounded-md px-2 py-1 !bg-red-400 border-0 !text-white'
+                      >Eliminar</div>
                     </div>
                   </div>
                 </div>

@@ -1,10 +1,40 @@
+
+
+export interface AttachmentProject {
+  description: string;
+  id: number;
+  url: string;
+  filename: string;
+}
+
+export interface Contribution {
+  amount: number;
+  createdAt: string;
+  user: UserContribution;
+}
+
+export interface UserContribution {
+  name: string;
+}
+
+export interface TierProject {
+  id: number;
+  amount: number;
+  benefit: string;
+}
+
 export interface Project {
   id: number;
   title: string;
   description: string;
   domain: string | null;
+  resume: string;
+  allowFree: boolean;
+  tiers: TierProject[];
 
   complexity: 'LOW' | 'MEDIUM' | 'HIGH';
+
+  contributions: Contribution[];
 
   teamSize: number;
   raised: number;
@@ -41,4 +71,5 @@ export interface Project {
   updatedAt: string;
 
   isFavorite?: boolean;
+  attachments: AttachmentProject[]
 }

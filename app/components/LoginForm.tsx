@@ -30,8 +30,10 @@ export default function LoginForm() {
 
       if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión');
 
-      localStorage.setItem('token', data.access_token);
-      document.cookie = `token=${data.access_tokenreg}; path=/; max-age=86400`;
+      localStorage.setItem("token", data.access_token);
+
+      document.cookie = `token=${data.access_token}; path=/; max-age=86400`;
+      
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
